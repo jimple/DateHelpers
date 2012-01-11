@@ -33,8 +33,8 @@ NSDate *setDateToMidnite(NSDate *aDate) {
                                                         NSSecondCalendarUnit |
                                                         NSMinuteCalendarUnit) fromDate:aDate];
     
-    [dateComps setHour:1];
-    [dateComps setMinute:1];
+    [dateComps setHour:0];
+    [dateComps setMinute:0];
     [dateComps setSecond:0];
     
     NSDate *midniteDate = [calendar dateFromComponents:dateComps];
@@ -129,8 +129,16 @@ NSDate *setDateToDayOfMonth(NSDate *theDate, int dayOfMonth) {
                                                         NSHourCalendarUnit | 
                                                         NSSecondCalendarUnit |
                                                         NSMinuteCalendarUnit) fromDate:theDate];
+    NSRange days = [calendar rangeOfUnit:NSDayCalendarUnit
+                                  inUnit:NSMonthCalendarUnit
+                                 forDate:theDate];
+    
+    if (dayOfMonth < 1)
+        dayOfMonth = 1;
+    if (dayOfMonth > days.length)
+        dayOfMonth = days.length;
+    
     [dateComps setDay:dayOfMonth];
-    [dateComps setSecond:0];
     
     NSDate *processedDate = [calendar dateFromComponents:dateComps];
     
