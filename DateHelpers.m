@@ -2,34 +2,40 @@
 //  DateHelpers.m
 //  
 //
-//  
-//  Copyright (c) 2012 Jared Sinclair RN. All rights reserved.
+//  Created by Jared Sinclair 9/2/11.
+//  Copyright (c) 2014 Jared Sinclair. All rights reserved.
 //
 
 
 #include "DateHelpers.h"
 
+static inline NSCalendar * cachedCalendar() {
+    static dispatch_once_t once;
+    static NSCalendar * cachedCalendar;
+    dispatch_once(&once, ^ {
+        cachedCalendar = [NSCalendar currentCalendar];
+    });
+    return cachedCalendar;
+};
 
-NSUInteger daysBetween(NSDate *fromDate, NSDate *toDate) {
+NSInteger daysBetween(NSDate *fromDate, NSDate *toDate) {
     
     fromDate = setDateToMidnite(fromDate);
     toDate = setDateToMidnite(toDate);
     
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    calendar.timeZone = [NSTimeZone defaultTimeZone];
-    
+    NSCalendar *calendar = cachedCalendar();
+
     NSInteger startDay = [calendar ordinalityOfUnit:NSDayCalendarUnit
-                                             inUnit: NSEraCalendarUnit forDate:fromDate];
+                                       inUnit: NSEraCalendarUnit forDate:fromDate];
     NSInteger endDay = [calendar ordinalityOfUnit:NSDayCalendarUnit
-                                           inUnit: NSEraCalendarUnit forDate:toDate];
+                                     inUnit: NSEraCalendarUnit forDate:toDate];
     return endDay - startDay;
 }
 
 
 NSDate *setDateToMidnite(NSDate *aDate) {
     
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    calendar.timeZone = [NSTimeZone defaultTimeZone];
+    NSCalendar *calendar = cachedCalendar();
     
     NSDateComponents *dateComps = [calendar components:(NSYearCalendarUnit |
                                                         NSMonthCalendarUnit |
@@ -48,10 +54,9 @@ NSDate *setDateToMidnite(NSDate *aDate) {
 }
 
 
-NSDate *setDatetoHourAndMinute(NSDate *theDate, int hour, int minute) {
+NSDate *setDatetoHourAndMinute(NSDate *theDate, NSInteger hour, NSInteger minute) {
     
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    calendar.timeZone = [NSTimeZone defaultTimeZone];
+    NSCalendar *calendar = cachedCalendar();
     
     NSDateComponents *dateComps = [calendar components:(NSYearCalendarUnit |
                                                         NSMonthCalendarUnit |
@@ -70,10 +75,9 @@ NSDate *setDatetoHourAndMinute(NSDate *theDate, int hour, int minute) {
 }
 
 
-int dayOfTheWeekFromDate(NSDate *aDate) {
+NSInteger dayOfTheWeekFromDate(NSDate *aDate) {
     
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    calendar.timeZone = [NSTimeZone defaultTimeZone];
+    NSCalendar *calendar = cachedCalendar();
     
     NSDateComponents *dateComps = [calendar components:(NSWeekdayCalendarUnit) fromDate:aDate];
     
@@ -81,67 +85,70 @@ int dayOfTheWeekFromDate(NSDate *aDate) {
 }
 
 
-int dayOfTheMonthFromDate(NSDate *aDate) {
+NSInteger dayOfTheMonthFromDate(NSDate *aDate) {
     
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    calendar.timeZone = [NSTimeZone defaultTimeZone];
+    NSCalendar *calendar = cachedCalendar();
     
     NSDateComponents *dateComps = [calendar components:(NSDayCalendarUnit) fromDate:aDate];
     
     return [dateComps day];
 }
 
-int currentMonth(void) {
+NSInteger currentMonth(void) {
     
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    calendar.timeZone = [NSTimeZone defaultTimeZone];
+    NSCalendar *calendar = cachedCalendar();
     
     NSDateComponents *dateComps = [calendar components:(NSMonthCalendarUnit) fromDate:[NSDate date]];
     
     return [dateComps month];
 }
 
-NSDate *shiftDateByXmonths(NSDate *aDate, int shift) {
+NSDate *shiftDateByXmonths(NSDate *aDate, NSInteger shift) {
     
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    calendar.timeZone = [NSTimeZone defaultTimeZone];
+    NSCalendar *calendar = cachedCalendar();
     NSDateComponents *dateComps = [[NSDateComponents alloc] init];
     [dateComps setMonth:shift];
     NSDate *processedDate = [calendar dateByAddingComponents:dateComps toDate:aDate options:0];
     return processedDate;
 }
 
-NSDate *shiftDateByXweeks(NSDate *aDate, int shift) {
+NSDate *shiftDateByXweeks(NSDate *aDate, NSInteger shift) {
     
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    calendar.timeZone = [NSTimeZone defaultTimeZone];
+    NSCalendar *calendar = cachedCalendar();
     NSDateComponents *dateComps = [[NSDateComponents alloc] init];
     [dateComps setWeek:shift];
     NSDate *processedDate = [calendar dateByAddingComponents:dateComps toDate:aDate options:0];
     return processedDate;
 }
 
-NSDate *shiftDateByXdays(NSDate *aDate, int shift) {
+NSDate *shiftDateByXdays(NSDate *aDate, NSInteger shift) {
     
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    calendar.timeZone = [NSTimeZone defaultTimeZone];
+    NSCalendar *calendar = cachedCalendar();
     NSDateComponents *dateComps = [[NSDateComponents alloc] init];
     [dateComps setDay:shift];
     NSDate *processedDate = [calendar dateByAddingComponents:dateComps toDate:aDate options:0];
     return processedDate;
 }
 
-NSDate *setDateToDayOfMonth(NSDate *theDate, int dayOfMonth) {
+NSDate *setDateToDayOfMonth(NSDate *theDate, NSInteger dayOfMonth) {
     
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    calendar.timeZone = [NSTimeZone defaultTimeZone];
-    
+    NSCalendar *calendar = cachedCalendar();
+
     NSDateComponents *dateComps = [calendar components:(NSYearCalendarUnit |
                                                         NSMonthCalendarUnit |
                                                         NSDayCalendarUnit |
                                                         NSHourCalendarUnit | 
                                                         NSSecondCalendarUnit |
                                                         NSMinuteCalendarUnit) fromDate:theDate];
+    
+    NSRange days = [calendar rangeOfUnit:NSDayCalendarUnit 
+                                   inUnit:NSMonthCalendarUnit 
+                                  forDate:[calendar dateFromComponents:dateComps]];
+    NSInteger lastDay = days.length;
+    
+    if (dayOfMonth > lastDay)
+        dayOfMonth = lastDay;
+    
     [dateComps setDay:dayOfMonth];
     [dateComps setSecond:0];
     
